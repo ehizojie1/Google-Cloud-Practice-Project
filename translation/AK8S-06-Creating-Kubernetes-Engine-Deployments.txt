@@ -1,0 +1,50 @@
+ak8s- 06
+AK8S-06 Creating Kubernetes Engine Deployments
+
+Overview
+In this lab, you explore the basics of using deployment manifests. Manifests are files that contain configurations required for a deployment that can be used across different Pods. Manifests are easy to change.
+
+Objectives
+In this lab, you learn how to perform the following tasks:
+Create deployment manifests, deploy to cluster, and verify Pod rescheduling as nodes are disabled
+Trigger manual scaling up and down of Pods in deployments
+Trigger deployment rollout (rolling update to new version) and rollbacks
+Perform a Canary deployment
+
+(I've translated all these to 100% command-line code)
+
+Task 1. Create deployment manifests and deploy to the cluster
+1. export my_zone=us-central1-a
+2. export my_cluster=standard-cluster-1
+3. source <(kubectl completion bash)
+4. gcloud container clusters create $my_cluster --num-nodes 3  --enable-ip-alias --zone $my_zone
+5. gcloud container clusters get-credentials $my_cluster --zone $my_zone
+6. git clone https://github.com/GoogleCloudPlatformTraining/training-data-analyst
+7. cd ~/training-data-analyst/courses/ak8s/06_Deployments/
+8. kubectl apply -f ./nginx-deployment.yaml
+9. kubectl get deployments
+
+Task 2. Manually scale up and down the number of Pods in deployments
+10. kubectl scale --replicas=1 deployment nginx-deployment
+11. kubectl get deployments
+12. kubectl scale --replicas=3 deployment nginx-deployment
+13. kubectl get deployments
+
+Task 3. Trigger a deployment rollout and a deployment rollback
+14. kubectl set image deployment.v1.apps/nginx-deployment nginx=nginx:1.9.1 --record
+15. kubectl rollout status deployment.v1.apps/nginx-deployment
+16. kubectl get deployments
+17. kubectl rollout history deployment nginx-deployment
+18. kubectl rollout undo deployments nginx-deployment
+19. kubectl rollout history deployment nginx-deployment
+20. kubectl rollout history deployment/nginx-deployment --revision=3
+
+Task 4. Define the service type in the manifest
+21. kubectl apply -f ./service-nginx.yaml
+22. kubectl get service nginx
+
+Task 5. Perform a canary deployment
+23. kubectl apply -f nginx-canary.yaml
+24. kubectl get deployments
+25. kubectl scale --replicas=0 deployment nginx-deployment
+26. kubectl get deployments
