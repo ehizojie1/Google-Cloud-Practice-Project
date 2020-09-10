@@ -1,0 +1,20 @@
+AK8S-05 Upgrading Kubernetes Engine Clusters
+
+OVERVIEW
+In this lab, you will upgrade a GKE cluster using the GCP Console.
+
+OBJECTIVES
+In this lab, you learn how to perform the following tasks:
+Use the GCP Console to upgrade your GKE cluster
+(I've translated this to 100% command-line code)
+
+
+Task 1. Deploy a GKE Cluster
+1. export my_zone=us-central1-c
+2. export my_cluster=cluster-1
+3. gcloud container get-server-config --zone $my_zone
+4. gcloud container clusters create $my_cluster --num-nodes 3 --zone $my_zone --cluster-version 1.15.12-gke.2 --enable-ip-alias
+
+Task 2: Upgrade your GKE cluster
+5. gcloud container clusters upgrade $my_cluster --zone $my_zone --cluster-version="1.15.12-gke.17"
+6. gcloud container clusters upgrade $my_cluster --zone $my_zone --master --cluster-version="1.15.12-gke.17"
