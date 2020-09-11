@@ -14,37 +14,88 @@ Perform a Canary deployment
 (I've translated all these to 100% command-line code)
 
 Task 1. Create deployment manifests and deploy to the cluster
+
+  "Create a GKE Cluster"
+  -i-"Command to set the environment variable for the zone and cluster name."
 1. export my_zone=us-central1-a
 2. export my_cluster=standard-cluster-1
+   
+  -ii-"Configure kubectl tab completion"
 3. source <(kubectl completion bash)
+   
+  -iii-"Create a Kubernetes cluster"
 4. gcloud container clusters create $my_cluster --num-nodes 3  --enable-ip-alias --zone $my_zone
+
+  -iv-"Configure access to your cluster for the kubectl command-line tool"
 5. gcloud container clusters get-credentials $my_cluster --zone $my_zone
+
+  -v-"Change to the directory that contains the sample files for the lab"
 6. git clone https://github.com/GoogleCloudPlatformTraining/training-data-analyst
 7. cd ~/training-data-analyst/courses/ak8s/06_Deployments/
+
+  "Create a deployment manifest"
+  -i-"deploy the manifest provided for you"
 8. kubectl apply -f ./nginx-deployment.yaml
+   
+  -ii-"view the list of deployments"
 9. kubectl get deployments
 
+
+
 Task 2. Manually scale up and down the number of Pods in deployments
+  -i-"Scale Up your pods"
 10. kubectl scale --replicas=1 deployment nginx-deployment
 11. kubectl get deployments
+
+  -ii-"Scale Down your pods"
 12. kubectl scale --replicas=3 deployment nginx-deployment
 13. kubectl get deployments
 
+
+
 Task 3. Trigger a deployment rollout and a deployment rollback
+
+  "Trigger a deployment rollout"
+  -i-"update the version of nginx in the deployment" 
 14. kubectl set image deployment.v1.apps/nginx-deployment nginx=nginx:1.9.1 --record
+
+  -ii-"view the rollout status"
 15. kubectl rollout status deployment.v1.apps/nginx-deployment
 16. kubectl get deployments
+
+  -iii-"View the rollout history of the deployment"
 17. kubectl rollout history deployment nginx-deployment
+
+   "Trigger a deployment rollback"
+   -i-"roll back to the previous version of the nginx deployment"
 18. kubectl rollout undo deployments nginx-deployment
+    
+   -ii-"view the updated rollout history of the deployment"
 19. kubectl rollout history deployment nginx-deployment
 20. kubectl rollout history deployment/nginx-deployment --revision=3
 
+
+
 Task 4. Define the service type in the manifest
+  -i-"deploy the manifest provided for you"
 21. kubectl apply -f ./service-nginx.yaml
+
+  "Verify the LoadBalancer creation"
+  -i-"view the details of the nginx service"(Usually takes about 30seconds)
 22. kubectl get service nginx
+23. When the external IP appears, open http://[EXTERNAL_IP]:60000/ in a new browser tab to see the server being served through network load balancing
+
+
 
 Task 5. Perform a canary deployment
-23. kubectl apply -f nginx-canary.yaml
-24. kubectl get deployments
-25. kubectl scale --replicas=0 deployment nginx-deployment
-26. kubectl get deployments
+
+  -i-"Create the canary deployment based on the configuration file provided for you"
+24. kubectl apply -f nginx-canary.yaml
+  
+  -ii-"verify that both the nginx and the nginx-canary deployments are present."
+25. kubectl get deployments
+26. Switch back to the browser tab that is connected to the external LoadBalancer service ip and refresh the page. You should continue to see the standard "Welcome to nginx" page
+ 
+  -iii-"Scale down the primary deployment to 0 replicas"
+27. kubectl scale --replicas=0 deployment nginx-deployment
+28. kubectl get deployments

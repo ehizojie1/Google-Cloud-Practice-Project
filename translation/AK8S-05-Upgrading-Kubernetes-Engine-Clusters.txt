@@ -10,11 +10,22 @@ Use the GCP Console to upgrade your GKE cluster
 
 
 Task 1. Deploy a GKE Cluster
+- "Deploy a GKE cluster running a Kubernetes version that is not the most recent release"
+   -i-" Command to set the environment variable for the zone and cluster name."
 1. export my_zone=us-central1-c
 2. export my_cluster=cluster-1
+
+   -ii-"List of available Kubernetes versions".
 3. gcloud container get-server-config --zone $my_zone
+
+   -iii-"Select the lowest version number"
 4. gcloud container clusters create $my_cluster --num-nodes 3 --zone $my_zone --cluster-version 1.15.12-gke.2 --enable-ip-alias
 
+
 Task 2: Upgrade your GKE cluster
+- "Upgrade your GKE cluster and all of the nodes"
+    -i-"Select the most recent (highest) build available"
 5. gcloud container clusters upgrade $my_cluster --zone $my_zone --cluster-version="1.15.12-gke.17"
+    
+    -ii-"Master Upgrade"
 6. gcloud container clusters upgrade $my_cluster --zone $my_zone --master --cluster-version="1.15.12-gke.17"
